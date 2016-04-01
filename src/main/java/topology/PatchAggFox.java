@@ -10,10 +10,7 @@ import backtype.storm.tuple.Values;
 import tool.Serializable;
 import util.ConfigUtil;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static tool.Constants.*;
 
@@ -34,62 +31,210 @@ public class PatchAggFox extends BaseRichBolt {
 
     /* Keeps track on which patches of the certain frame have already been received */
     //Map< Integer, HashSet<Serializable.Rect> > frameAccount;
-    Map< Integer, Integer> frameMonitor;
+    Map< Integer, Integer> frameMonitor1;
+    Map< Integer, Integer> frameMonitor2;
 
     /* Contains the list of logos found found on a given frame */
-    Map< Integer, List<List<Serializable.Rect>> > foundRectAccount;
+    Map< Integer, List<List<Serializable.Rect>> > foundRectAccount1;
+    Map< Integer, HashMap<String, List<Serializable.Rect>> > foundRectAccount2;
     private int sampleFrames;
+
+    private boolean useNMS;
+    private double nmsScore;
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         this.collector = outputCollector;
-        frameMonitor = new HashMap<>();
-        foundRectAccount = new HashMap<>();
+        frameMonitor1 = new HashMap<>();
+        frameMonitor2 = new HashMap<>();
+        foundRectAccount1 = new HashMap<>();
+        foundRectAccount2 = new HashMap<>();
+        useNMS = true;
         sampleFrames = ConfigUtil.getInt(map, "sampleFrames", 1);
+        nmsScore = ConfigUtil.getDouble(map, "nmsScoreThreshold", 0.5);
     }
 
     @Override
     public void execute(Tuple tuple) {
+        String streamId = tuple.getSourceStreamId();
+        if (streamId.equals(DETECTED_LOGO_STREAM)) {
+            processLogoStream(tuple);
+        }
+        else if(streamId.equals(DETECTED_SIFT_SLM_LOGO_STREAM)) {
+            processSLMLogoStream(tuple);
+        }
+        else if(streamId.equals(SLM_STREAM_SET_NMS_SIFT_COMMAND)) {
+            processSetNMSCommand(tuple);
+        }
+        else {
+            System.out.println("Unexpected stream!");
+        }
+    }
 
+    private void processSetNMSCommand(Tuple tuple) {
+        useNMS = tuple.getBooleanByField(SLM_FIELD_NMS);
+        collector.ack(tuple);
+    }
+
+    public void processLogoStream(Tuple tuple) {
         //opencv_core.IplImage fk = new opencv_core.IplImage();
         int frameId = tuple.getIntegerByField(FIELD_FRAME_ID);
         int patchCount              = tuple.getIntegerByField(FIELD_PATCH_COUNT);
         List<Serializable.Rect> foundRect = (List<Serializable.Rect>)tuple.getValueByField(FIELD_FOUND_RECT);
 
-        if (!foundRectAccount.containsKey(frameId)){
-            foundRectAccount.put(frameId, new ArrayList<>());
+        if (!foundRectAccount1.containsKey(frameId)){
+            foundRectAccount1.put(frameId, new ArrayList<>());
             for (int logoIndex = 0; logoIndex < foundRect.size(); logoIndex ++) {
-                foundRectAccount.get(frameId).add(new ArrayList<>());
+                foundRectAccount1.get(frameId).add(new ArrayList<>());
             }
         }
         /* Updating the list of detected logos on the frame */
         for (int logoIndex = 0; logoIndex < foundRect.size(); logoIndex ++) {
             if (foundRect.get(logoIndex) != null) {
-                foundRectAccount.get(frameId).get(logoIndex).add(foundRect.get(logoIndex));
+                foundRectAccount1.get(frameId).get(logoIndex).add(foundRect.get(logoIndex));
             }
         }
-        frameMonitor.computeIfAbsent(frameId, k->0);
-        frameMonitor.computeIfPresent(frameId, (k,v)->v+1);;
+        frameMonitor1.computeIfAbsent(frameId, k->0);
+        frameMonitor1.computeIfPresent(frameId, (k,v)->v+1);;
 
+        sendOutputIfFullyReceived(frameId, patchCount);
+
+        collector.ack(tuple);
+    }
+
+    public void processSLMLogoStream(Tuple tuple) {
+        //opencv_core.IplImage fk = new opencv_core.IplImage();
+        int frameId = tuple.getIntegerByField(FIELD_FRAME_ID);
+        int patchCount = tuple.getIntegerByField(FIELD_PATCH_COUNT);
+        HashMap<String, Serializable.Rect> foundRect = (HashMap<String, Serializable.Rect>)tuple.getValueByField(FIELD_FOUND_SLM_RECT);
+
+        if (!foundRectAccount2.containsKey(frameId)){
+            foundRectAccount2.put(frameId, new HashMap<String, List<Serializable.Rect>>());
+
+            foundRect.forEach((logoId, rect) -> {
+                foundRectAccount2.get(frameId).put(logoId, new ArrayList<Serializable.Rect>());
+            });
+        }
+
+        /* Updating the list of detected logos on the frame */
+        foundRect.forEach((id, rect) -> {
+            if(rect != null)
+                foundRectAccount2.get(frameId).get(id).add(rect);
+        });
+
+        frameMonitor2.computeIfAbsent(frameId, k->0);
+        frameMonitor2.computeIfPresent(frameId, (k,v)->v+1);;
+
+        sendOutputIfFullyReceived(frameId, patchCount);
+
+        collector.ack(tuple);
+    }
+
+    public void sendOutputIfFullyReceived(int frameId, int patchCount) {
         /* If all patches of this frame are collected proceed to the frame aggregator */
-        if (frameMonitor.get(frameId) == patchCount) {
+        if (frameMonitor1.get(frameId) != null
+                && frameMonitor1.get(frameId) == patchCount
+                && frameMonitor2.get(frameId) != null
+                && frameMonitor2.get(frameId) == patchCount) {
+
+            List<List<Serializable.Rect>> rectList1 = foundRectAccount1.get(frameId);
+            HashMap<String, List<Serializable.Rect>> rectList2 = foundRectAccount2.get(frameId);
+
+            if(useNMS) {
+                // Non-maximum supression
+                for (int i = 0; i < rectList1.size(); i++) {
+                    List<Serializable.Rect> thisList = rectList1.get(i);
+                    rectList1.set(i, doNonMaximumSuppression(thisList, nmsScore));
+                }
+                for (String key : rectList2.keySet()) {
+                    List<Serializable.Rect> thisList = rectList2.get(key);
+                    rectList2.put(key, doNonMaximumSuppression(thisList, nmsScore));
+                }
+            }
 
             if (frameId % sampleFrames == 0) {
-                for (int f = frameId; f < frameId + sampleFrames; f ++){
-                    collector.emit(PROCESSED_FRAME_STREAM, new Values(f, foundRectAccount.get(frameId)));
+                for (int f = frameId; f < frameId + sampleFrames; f ++) {
+                    collector.emit(PROCESSED_FRAME_STREAM, new Values(
+                            f,
+                            rectList1,
+                            rectList2
+                    ));
                 }
-            } else {//shall not be here!
+            } else { //shall not be here!
                 throw new IllegalArgumentException("frameId % sampleFrames != 0, frameID: " + frameId + ", sampleFrames: " + sampleFrames);
             }
 
-            frameMonitor.remove(frameId);
-            foundRectAccount.remove(frameId);
+            frameMonitor1.remove(frameId);
+            frameMonitor2.remove(frameId);
+            foundRectAccount1.remove(frameId);
+            foundRectAccount2.remove(frameId);
         }
-        collector.ack(tuple);
+    }
+
+    private List<Serializable.Rect> doNonMaximumSuppression(List<Serializable.Rect> inputList, double overlapThreshold) {
+
+        // Convert from Rect to ScoredRect
+        ArrayList<Serializable.ScoredRect> boxes = new ArrayList<Serializable.ScoredRect>();
+        for(Serializable.Rect i : inputList) {
+            boxes.add(new Serializable.ScoredRect(i));
+        }
+
+        // Do the non-maximum supression
+
+        // Nothing to process
+        if(boxes.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        ArrayList<Serializable.ScoredRect> results = new ArrayList<Serializable.ScoredRect>();
+
+        ArrayList<Serializable.ScoredRect> sorted = new ArrayList<Serializable.ScoredRect>();
+        sorted.addAll(boxes);
+        sorted.sort((arg0, arg1) -> Integer.compare(arg0.getArea(), arg1.getArea()));
+
+        while(!sorted.isEmpty()) {
+            Serializable.ScoredRect last = sorted.get(sorted.size() - 1);
+            results.add(last);
+
+            ArrayList<Integer> toDelete = new ArrayList<Integer>();
+
+            for(int i = 0; i < sorted.size(); i++) {
+                Serializable.ScoredRect curr = sorted.get(i);
+
+                int mx1 = Math.max(last.getX1(), curr.getX1());
+                int my1 = Math.max(last.getY1(), curr.getY1());
+                int mx2 = Math.min(last.getX2(), curr.getX2());
+                int my2 = Math.min(last.getY2(), curr.getY2());
+
+                int width = Math.max(0, mx2 - mx1 + 1);
+                int height = Math.max(0, my2 - my1 + 1);
+
+                double overlap = (double)(width * height) / curr.getArea();
+
+                if(overlap > overlapThreshold) {
+                    toDelete.add(i);
+                }
+            }
+
+            Collections.sort(toDelete);
+            Collections.reverse(toDelete);
+
+            for(int i = 0; i < toDelete.size(); i++) {
+                sorted.remove((int)toDelete.get(i));
+            }
+        }
+
+        // Not sure if you can just cast, but let's just do this first
+        ArrayList<Serializable.Rect> resultsToReturn = new ArrayList<>();
+        for(int i = 0; i < results.size(); i++) {
+            resultsToReturn.add(results.get(i));
+        }
+
+        return resultsToReturn;
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
-        outputFieldsDeclarer.declareStream(PROCESSED_FRAME_STREAM, new Fields(FIELD_FRAME_ID, FIELD_FOUND_RECT_LIST));
+        outputFieldsDeclarer.declareStream(PROCESSED_FRAME_STREAM, new Fields(FIELD_FRAME_ID, FIELD_FOUND_RECT_LIST, FIELD_FOUND_SLM_RECT_LIST));
     }
 }

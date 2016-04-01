@@ -11,6 +11,7 @@ import java.util.List;
 public class StreamFrame implements Comparable<StreamFrame> {
     final public int frameId;
     final public opencv_core.Mat image;
+    final public String rects;
 
     /**
      * creates a StreamFrame with given id, image matrix and list of rectangles corresponding to the detected logos.
@@ -20,6 +21,13 @@ public class StreamFrame implements Comparable<StreamFrame> {
     public StreamFrame(int frameId, opencv_core.Mat image) {
         this.frameId = frameId;
         this.image = image;
+        this.rects = "[]";
+    }
+
+    public StreamFrame(int frameId, opencv_core.Mat image, String rects) {
+        this.frameId = frameId;
+        this.image = image;
+        this.rects = rects;
     }
 
     @Override

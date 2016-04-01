@@ -76,7 +76,7 @@ public class tPatchAggSampleDelta extends BaseRichBolt {
         if (frameMonitor.get(frameId) == patchCount) {
 
             if (frameId % sampleFrames == 0) {
-                //collector.emit(PROCESSED_FRAME_STREAM, new Values(frameId, foundRectAccount.get(frameId)));
+                //collector.emit(PROCESSED_FRAME_STREAM, new Values(frameId, foundRectAccount1.get(frameId)));
                 for (int f = frameId; f < frameId + sampleFrames; f ++){
                     collector.emit(PROCESSED_FRAME_STREAM, new Values(f, foundRectAccount.get(frameId)));
                 }

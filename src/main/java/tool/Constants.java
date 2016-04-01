@@ -71,6 +71,56 @@ public interface Constants {
     public final static String FIELD_EXTRACTED_TEMPLATE = "ext-temp";
     public final static String FIELD_LOGO_INDEX = "logo-index";
 
+    // ===== SLM
+    public final static String SLM_FIELD_LOGO_ID = "logo_manager_logo_id";
+    public final static String SLM_FIELD_RAW_LOGO_MAT = "field-lm-raw-logo-data";
+
+    public final static String SLM_FIELD_COMMAND_ID = "field-command-id";
+
+    public final static String SLM_STREAM_ADD_COMMAND = "setting-stream-add-command";
+    public final static String SLM_STREAM_DELETE_COMMAND = "setting-stream-delete-command";
+    public final static String SLM_STREAM_MUTE_COMMAND = "mute_mute_command_stream";
+    public final static String SLM_STREAM_UNMUTE_COMMAND = "mute_unmute_command_stream";
+
+    public final static String SLM_STREAM_SET_ALGORITHM_COMMAND = "set-algorithm-command-stream";
+    public final static String SLM_FIELD_USE_SIFT = "use-sift-setting";
+    public final static String SLM_FIELD_USE_HOG = "use-hog-setting";
+
+    public final static String SLM_STREAM_SET_DRAW_RECTANGLES_COMMAND = "set-draw-rectangles-command-stream";
+    public final static String SLM_FIELD_DRAW = "draw-setting";
+
+    public final static String SLM_STREAM_SET_NMS_SIFT_COMMAND = "slm-stream-set-nms-sift-command";
+    public final static String SLM_STREAM_SET_NMS_HOG_COMMAND = "slm-stream-set-nms-hog-command";
+    public final static String SLM_FIELD_NMS = "slm-field-nms";
+
+    public static final String SLM_STREAM_ADD_PROCESSED_SIFT_LOGO = "slm-stream-add-processed-sift-logo";
+    public static final String SLM_FIELD_PROCESSED_SIFT_LOGO = "slm-field-processed-sift-logo";
+    
+    public static final String SLM_STREAM_ADD_PROCESSED_HOG_LOGO = "slm-stream-add-processed-hog-logo";
+    public static final String SLM_FIELD_PROCESSED_HOG_LOGO = "slm-field-processed-hog-logo";
+
+    public static final String SPOUT_TO_DIRECTOR_STREAM = "spout-to-director-stream";
+
+    public static final String FRAME_ALGORITHM_STATUS_STREAM = "frame-algorithm-status-stream";
+    public final static String FIELD_USE_SIFT = "field-use-sift";
+    public final static String FIELD_USE_HOG = "field-use-hog";
+
+    public static final String HOG_SAMPLE_FRAME_STREAM = "hog-sample-frame-stream";
+    
+    public static final String DETECTED_SIFT_SLM_LOGO_STREAM = "detected-sift-slm-logo-stream";
+    public static final String FIELD_FOUND_SLM_RECT = "field-found-slm-rect";
+    public static final String FIELD_FOUND_SLM_RECT_LIST = "field-found-slm-rect-list";
+
+    public static final String FIELD_OUTPUT_RECTANGLES = "field-output-rectangles";
+
+    public static final String DETECTED_HOG_SLM_LOGO_STREAM = "detected-hog-slm-logo-stream";
+    
+    public static final int SLM_LOGO_STATE_NORMAL = 0;
+    public static final int SLM_LOGO_STATE_MUTED = 1;
+
+    public static final String HOG_PATCH_FRAME_STREAM = "hog-patch-frame-stream";
+    public static final String HOG_PROCESSED_FRAME_STREAM = "hog-processed-frame-stream";
+
 ////////////not used
 
     public static String FIELD_FEATURE_DESC = "feat";

@@ -118,6 +118,7 @@ public class RedisStreamProducerFox implements Runnable {
                         opencv_core.Mat matOrg = new opencv_core.Mat(image);
                         Serializable.Mat sMat = new Serializable.Mat(matOrg);
                         jedis.rpush(this.queueName, sMat.toByteArray());
+                        jedis.rpush("resultRects", nextFrame.rects);
 
                         System.out.println("finishedAdd: " + System.currentTimeMillis() + ",Fid: " + nextFrame.frameId);
                         currentFrameID++;

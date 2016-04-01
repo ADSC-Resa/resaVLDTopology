@@ -64,12 +64,14 @@ public class RedisQueueSpout extends BaseRichSpout {
     public void nextTuple() {
         Jedis jedis = getConnectedJedis();
         if (jedis == null) {
+            System.out.println("Null Jedis");
             return;
         }
         Object text;
         try {
             text = byteQueueName == null ? jedis.lpop(queue) : jedis.lpop(byteQueueName);
         } catch (Exception e) {
+            System.out.println("Exception in getting item.");
             disconnect();
             return;
         }
@@ -82,7 +84,8 @@ public class RedisQueueSpout extends BaseRichSpout {
         collector.emit(Arrays.asList(data), data);
     }
 
-    private Jedis getConnectedJedis() {
+    // Made protected to allow subclasses to access jedis as needed - Ian
+    protected Jedis getConnectedJedis() {
         if (jedis != null) {
             return jedis;
         }

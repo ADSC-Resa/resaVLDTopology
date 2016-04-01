@@ -13,6 +13,7 @@ import java.util.Map;
 
 import static tool.Constants.FIELD_FRAME_ID;
 import static tool.Constants.FIELD_FRAME_MAT;
+import static tool.Constants.FIELD_OUTPUT_RECTANGLES;
 import static util.ConfigUtil.getInt;
 
 /**
@@ -70,8 +71,10 @@ public class RedisFrameOutputFox extends BaseRichBolt {
         int frameId = tuple.getIntegerByField(FIELD_FRAME_ID);
         opencv_core.IplImage imageFK = new opencv_core.IplImage();
 
+        String rects = tuple.getStringByField(FIELD_OUTPUT_RECTANGLES);
+
         Serializable.Mat sMat = (Serializable.Mat) tuple.getValueByField(FIELD_FRAME_MAT);
-        producer.addFrame(new StreamFrame(frameId, sMat.toJavaCVMat()));
+        producer.addFrame(new StreamFrame(frameId, sMat.toJavaCVMat(), rects));
 
         if (toDebug) {
             System.out.println("producerAdd: " + System.currentTimeMillis() + ":" + frameId);

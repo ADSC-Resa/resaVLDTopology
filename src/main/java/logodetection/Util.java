@@ -25,6 +25,11 @@ public class Util {
         opencv_core.line(finalImage, D, A, color, 4, 4, 0);
     }
 
+    public static void drawRectOnMat(opencv_core.Rect r, opencv_core.Mat finalImage, opencv_core.CvScalar scalar, int thickness) {
+        opencv_core.Scalar color = new opencv_core.Scalar(scalar);
+        opencv_core.rectangle(finalImage, r, color, thickness, 8, 0);
+    }
+
     /**
      *  Draws quadrilateral on given image matrix with color given as a scalar
      * @param Q 4x2 array with coordinates of the quadrilateral

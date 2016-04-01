@@ -10,7 +10,7 @@
 
     <properties>
             <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-            <javacpp.version>0.8</javacpp.version>
+            <javacpp.version>0.9</javacpp.version>
     </properties>
 
     <dependencies>
@@ -19,22 +19,23 @@
             <artifactId>jmatio</artifactId>
             <version>1.0</version>
         </dependency>
+
         <dependency>
             <groupId>org.bytedeco</groupId>
-                <artifactId>javacv</artifactId>
-            <version>0.8</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>javacpp</artifactId>
-                    <groupId>org.bytedeco</groupId>
-                </exclusion>
-            </exclusions>
+            <artifactId>javacv</artifactId>
+            <version>0.9</version>
+            <!--<exclusions>-->
+                <!--<exclusion>-->
+                    <!--<artifactId>javacpp</artifactId>-->
+                    <!--<groupId>org.bytedeco</groupId>-->
+                <!--</exclusion>-->
+            <!--</exclusions>-->
         </dependency>
-        <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>javacpp</artifactId>
-            <version>0.8</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.bytedeco</groupId>-->
+            <!--<artifactId>javacpp</artifactId>-->
+            <!--<version>0.9</version>-->
+        <!--</dependency>-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

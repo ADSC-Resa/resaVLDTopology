@@ -296,6 +296,103 @@ public class Serializable {
     }
 
     /**
+     * Kryo Serializable ScoredRect class. Subclass of Serializable.Rect, it includes a score for the rectangle.
+     * The score would usually be used to represent a matched score (e.g. HOG matching).
+     */
+    public static class ScoredRect extends Serializable.Rect implements java.io.Serializable, Comparable<ScoredRect> {
+        private static final long serialVersionUID = -6827975402116588963L;
+
+        /**
+         * Score of the rectangle. Usually used to represent the matched score.
+         */
+        public double score;
+        public String name;
+
+        public ScoredRect() {
+            super();
+        }
+
+        public ScoredRect(opencv_core.Rect rect) {
+            super(rect);
+        }
+
+        public ScoredRect(opencv_core.Rect rect, double score) {
+            super(rect);
+            this.score = score;
+        }
+
+        public ScoredRect(Serializable.Rect rect) {
+            this(rect.x, rect.y, rect.width, rect.height);
+        }
+
+        public ScoredRect(int x, int y, int width, int height) {
+            super(x, y, width, height);
+        }
+
+        public ScoredRect(int x, int y, int width, int height, double score) {
+            super(x, y, width, height);
+            this.score = score;
+        }
+
+        public boolean hasSameDimensions(Serializable.Rect that) {
+            return super.equals(that);
+        }
+
+        public int getX1() {
+            return x;
+        }
+
+        public int getX2() {
+            return x + width;
+        }
+
+        public int getY1() {
+            return y;
+        }
+
+        public int getY2() {
+            return y + height;
+        }
+
+        public int getArea() {
+            return width * height;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            ScoredRect rect = (ScoredRect) o;
+
+            if (height != rect.height) return false;
+            if (width != rect.width) return false;
+            if (x != rect.x) return false;
+            if (y != rect.y) return false;
+            if (score != score) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode() {
+            int result = x;
+            result = 31 * result + y;
+            result = 31 * result + width;
+            result = 31 * result + height;
+
+            result = result ^ Double.hashCode(score);
+
+            return result;
+        }
+
+        @Override
+        public int compareTo(ScoredRect that) {
+            return Double.compare(that.score, this.score);
+        }
+    }
+
+    /**
      * This is a serializable class used for patch identification. Each patch needs to be distinguished form others.
      * Each patch is uniquely identified by the id of its frame and by the rectangle it corresponds to.
      */

@@ -11,6 +11,7 @@ import util.ConfigUtil;
 
 import java.util.Map;
 
+import static org.bytedeco.javacpp.opencv_highgui.cvLoadImage;
 import static tool.Constants.*;
 
 /**
@@ -47,7 +48,10 @@ public class FrameSourceFox extends RedisQueueSpout {
         String id = String.valueOf(frameId);
         byte[] imgBytes = (byte[]) data;
 
+//        System.out.println("Fake image 1");
         opencv_core.IplImage fkImage = new opencv_core.IplImage();
+        opencv_core.IplImage fkimage2 = cvLoadImage("C:\\Users\\Ian\\Desktop\\FYP2\\hog\\1.jpg");
+//        System.out.println("Fake image 2");
         Serializable.Mat revMat = new Serializable.Mat(imgBytes);
 
         opencv_core.Mat mat = revMat.toJavaCVMat();
@@ -59,17 +63,17 @@ public class FrameSourceFox extends RedisQueueSpout {
 
         collector.emit(RAW_FRAME_STREAM, new Values(frameId, sMat), id);
         if (frameId % sampleFrames == 0) {
-            collector.emit(SAMPLE_FRAME_STREAM, new Values(frameId, sMat, sampleID), frameId);
-            sampleID ++;
+            collector.emit(SPOUT_TO_DIRECTOR_STREAM, new Values(frameId, sMat, sampleID), frameId);
+            sampleID++;
         }
         long nowTime = System.currentTimeMillis();
         System.out.printf("Sendout: " + nowTime + "," + frameId);
-        frameId ++;
+        frameId++;
     }
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
         declarer.declareStream(RAW_FRAME_STREAM, new Fields(FIELD_FRAME_ID, FIELD_FRAME_MAT));
-        declarer.declareStream(SAMPLE_FRAME_STREAM, new Fields(FIELD_FRAME_ID, FIELD_FRAME_MAT, FIELD_SAMPLE_ID));
+        declarer.declareStream(SPOUT_TO_DIRECTOR_STREAM, new Fields(FIELD_FRAME_ID, FIELD_FRAME_MAT, FIELD_SAMPLE_ID));
     }
 }

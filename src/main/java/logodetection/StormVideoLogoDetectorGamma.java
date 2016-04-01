@@ -136,6 +136,42 @@ public class StormVideoLogoDetectorGamma {
             System.out.println("Initialization of logo templates complete, id: " + logoIndex);
     }
 
+    /**
+     * Initializes and precomputes all key points and descriptors for SLM template logos
+     *
+     * @param params   The parameters for logo detection and matching.
+     * @param m The Mat of the template logo.
+     */
+    public StormVideoLogoDetectorGamma(Parameters params, Serializable.Mat m, int maxTemplateSize) {
+        if (Debug.logoDetectionDebugOutput)
+            System.out.println("Initializing SLM logos...");
+
+        int logoIndex = 0; // Logo index do not apply here.
+
+        // Initialize lists and matcher and sift
+        this.params = params;
+        addedTempList = new ArrayList<>();
+        robustMatcher = new RobustMatcher(params);
+        this.maxTemplateSize = maxTemplateSize;
+
+        sift = new SIFT(0, 3, params.getSiftParameters().getContrastThreshold(),
+                params.getSiftParameters().getEdgeThreshold(), params.getSiftParameters().getSigma());
+
+        // This is the index of the original logo templates
+        try {
+            Mat tmp = m.toJavaCVMat();
+            Mat descriptor = new Mat();
+            KeyPoint keyPoints = new KeyPoint();
+            sift.detectAndCompute(tmp, Mat.EMPTY, keyPoints, descriptor);
+            // Original templates have negative ids and null roi.
+            originalTemp = new LogoTemplate(tmp, keyPoints, descriptor, new Serializable.PatchIdentifier(-logoIndex - 1, null));
+        } catch (Exception e)  {
+            e.printStackTrace();
+        }
+
+        if (Debug.logoDetectionDebugOutput)
+            System.out.println("Initialization SLM logo templates complete.");
+    }
 
     /**
      * This methods looks for logos on the part of the frame defined by roi.

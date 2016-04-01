@@ -7,6 +7,8 @@ import redis.clients.jedis.Jedis;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import static org.bytedeco.javacpp.opencv_highgui.cvLoadImage;
 import static topology.StormConfigManager.*;
@@ -90,6 +92,11 @@ public class SimpleImageSenderFox {
             System.out.println("usage: ImageSender <confFile> queueName <st> <end> <fps>");
             return;
         }
+
+        System.out.println("Trying fake");
+        opencv_core.IplImage fake = new opencv_core.IplImage();
+        System.out.println("Trying fake end");
+
         SimpleImageSenderFox sender = new SimpleImageSenderFox(args[0], args[1]);
         System.out.println("start sender");
         sender.send2Queue(Integer.parseInt(args[2]), Integer.parseInt(args[3]), Integer.parseInt(args[4]));
