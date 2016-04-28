@@ -38,8 +38,8 @@ Finally open localhost:3000 for the Settings and Logo Manager. (Server should be
 An upgrade of the JavaCV 0.8 to 0.9 was done for this fork. It isn't as simple as changing the respective pom.xml; it requires some manual inclusions. Steps below:
 
 1. Update the pom.xml from JavaCV 0.8 to 0.9. Let Maven update the dependencies. It will compile but will not run (unlinked binary files).
-2. To solve the unlinked binary files issues, you need to manually download the JavaCV 0.9 binary files that Maven uses. You can do this at http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.bytedeco%22%20AND%20a%3A%22javacv%22 . Make sure you download version 0.9.
-3. Open the JAR file (`javacv-0.9-bin.jar`) in an archive viewer (i.e. change file extension to .zip and open as a zip file.)
+2. To solve the unlinked binary files issues, you need to manually download the JavaCV 0.9 binary files that Maven uses. You can do this at http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22org.bytedeco%22%20AND%20a%3A%22javacv%22 . Make sure you download version 0.9. (`javacv-0.9-bin.zip`)
+3. Open the ZIP file (`javacv-0.9-bin.zip`).
 4. Look for the JAR files (inside the JAR file above) named `opencv-OS_NAME-ARCHITECTURE.jar`. E.g. `opencv-windows-x86_64.jar`.
 5. Pick the JAR files that matches the OS/architectures you intent to run the application on.
 6. Extract all the files in the `opencv-OS_NAME-ARCHITECTURE.jar` files into the `/src/main/resources/` folder. Exclude the META-INF folder. You should have files inside the `/src/main/resources/org/bytedeco/...` folders.
