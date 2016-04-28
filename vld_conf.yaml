@@ -1,0 +1,111 @@
+#how long between heartbeats until supervisor considers that worker dead and tries to restart it
+supervisor.worker.timeout.secs: 120
+
+redis.host: "localhost"
+redis.port: 6379
+redis.sourceQueueName: "fSource"
+#used by RedisFrameOutput, for output queue
+redis.queueName: "tomQ"
+#used by spout, for input queue
+tVLDQueueName: "fSource"
+
+#local files
+sourceFilePath: "C:/Users/Ian/Desktop/FYP2/"
+imageFolder: "picture6"
+filePrefix: "frame"
+
+# 0 = false, true otherwise.
+useOriginalTemplateFiles: 0
+
+originalTemplateFileNames:
+- "C:/Users/Ian/Desktop/FYP2/logo/mc2.jpg"
+- "C:/Users/Ian/Desktop/FYP2/logo/adidas.jpg"
+- "C:/Users/Ian/Desktop/FYP2/logo/coke.jpg"
+- "C:/Users/Ian/Desktop/FYP2/logo/starbucks.jpg"
+- "C:/Users/Ian/Desktop/FYP2/logo/sony.jpg"
+
+topology.debug: false
+topology.stats.sample.rate: 1.0
+debugTopology: false
+
+minNumberOfMatches: 4
+maxAdditionTemp: 4
+sleepTime: 10
+startFrameID: 1
+maxWaitCount: 20
+tVLDMaxPending: 100
+sampleFrames: 4
+width: 640
+height: 480
+
+# SLM Settings
+slm.nodeToStorm: "nodeToStorm"
+slm.stormToNode: "stormToNode"
+slm.logoData: "logoData"
+
+# HOG algorithm settings
+hog.similarityCutoff: 0.65
+hog.maximumMatches: 15
+
+# Non Maximum Suppression Threshold
+nmsScoreThreshold: 0.5
+
+##### SLM topology bolt/spout settings
+tVLDSettingsAndLogoSpout.parallelism: 1
+tVLDSettingsAndLogoSpout.tasks: 1
+
+tVLDSiftLogoProcessor.parallelism: 1
+tVLDSiftLogoProcessor.tasks: 1
+
+tVLDHogLogoProcessor.parallelism: 1
+tVLDHogLogoProcessor.tasks: 1
+
+##### Main topology settings
+
+tVLDNumOfWorkers: 7
+
+#####
+
+tVLDSpout.parallelism: 1
+tVLDSpout.tasks: 1
+
+#####
+
+tVLDFrameAlgorithmDirector.parallelism: 1
+tVLDFrameAlgorithmDirector.tasks: 1
+
+#####
+
+tVLDPatchGen.parallelism: 1
+tVLDPatchGen.tasks: 1
+
+tVLDHogPatchGenerator.parallelism: 1
+tVLDHogPatchGenerator.tasks: 1
+tVLDHogPatchGenerator.hogPatchDivisionX: 0.5
+tVLDHogPatchGenerator.hogPatchDivisionY: 0.5
+
+#####
+
+tVLDPatchProc.parallelism: 3
+tVLDPatchProc.tasks: 3
+
+tVLDHogPatchProcessor.parallelism: 3
+tVLDHogPatchProcessor.tasks: 3
+
+#####
+
+tVLDPatchAgg.parallelism: 1
+tVLDPatchAgg.tasks: 1
+
+tVLDHogPatchAggregator.parallelism: 1
+tVLDHogPatchAggregator.tasks: 1
+
+#####
+
+tVLDPatchDraw.parallelism: 1
+tVLDPatchDraw.tasks: 1
+
+#####
+
+tVLDRedisFrameOut.parallelism: 1
+tVLDRedisFrameOut.tasks: 1
