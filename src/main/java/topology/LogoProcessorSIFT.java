@@ -30,7 +30,7 @@ public class LogoProcessorSIFT extends BaseRichBolt {
     @Override
     public void execute(Tuple tuple) {
         System.out.println("Fake image 1");
-        opencv_core.IplImage fkimage2 = cvLoadImage("C:\\Users\\Ian\\Desktop\\FYP2\\hog\\1.jpg");
+        opencv_core.IplImage fkimage2 = cvLoadImage(tool.Constants.FAKE_IMAGE);
 //        opencv_core.IplImage fake = new opencv_core.IplImage();
         System.out.println("Fake image 2");
 

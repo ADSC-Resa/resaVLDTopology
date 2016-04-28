@@ -125,6 +125,7 @@ public class VLDTopFox {
 
         builder.setBolt(patchProcBolt, new PatchProcessorFox(), getInt(conf, patchProcBolt + ".parallelism"))
                 .allGrouping(patchProcBolt, LOGO_TEMPLATE_UPDATE_STREAM)
+                .allGrouping(patchProcBolt, LOGO_TEMPLATE_UPDATE_STREAM_SLM)
                 .allGrouping(siftLogoProcessor, SLM_STREAM_ADD_PROCESSED_SIFT_LOGO) // THIS
                 .allGrouping(settingsAndLogoSpout, SLM_STREAM_DELETE_COMMAND) // THIS
                 .allGrouping(settingsAndLogoSpout, SLM_STREAM_MUTE_COMMAND) // THIS

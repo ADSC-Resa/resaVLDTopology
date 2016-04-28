@@ -79,6 +79,9 @@ public class PatchProcessorFox extends BaseRichBolt {
         else if (streamId.equals(LOGO_TEMPLATE_UPDATE_STREAM)) {
             processNewTemplate(tuple);
         }
+        else if (streamId.equals(LOGO_TEMPLATE_UPDATE_STREAM_SLM)) {
+            processNewTemplateSLM(tuple);
+        }
         else {
             //Next chunk of code is to make sure we execute the commands in order.
 //            int commandID = tuple.getIntegerByField(SLM_FIELD_COMMAND_ID);
@@ -183,11 +186,12 @@ public class PatchProcessorFox extends BaseRichBolt {
                 detector.detectLogosByFeatures(sifTfeatures);
 
                 Serializable.Rect detectedLogo = detector.getFoundRect();
-//                Serializable.Mat extractedTemplate = detector.getExtractedTemplate();
-//                if (detectedLogo != null) {
-//                    collector.emit(LOGO_TEMPLATE_UPDATE_STREAM,
-//                            new Values(identifierMat.identifier, extractedTemplate, detector.getParentIdentifier(), logoIndex));
-//                }
+                //TODO ======================================================================
+                Serializable.Mat extractedTemplate = detector.getExtractedTemplate();
+                if (detectedLogo != null) {
+                    collector.emit(LOGO_TEMPLATE_UPDATE_STREAM_SLM,
+                            new Values(identifierMat.identifier, extractedTemplate, detector.getParentIdentifier(), logoID));
+                }
 
                 detectedSLMLogoList.put(logoID, detectedLogo);
             }
@@ -207,6 +211,17 @@ public class PatchProcessorFox extends BaseRichBolt {
         detectors.get(logoIndex).incrementPriority(parent, 1);
     }
 
+    private void processNewTemplateSLM(Tuple tuple) {
+        Serializable.PatchIdentifier receivedPatchIdentifier = (Serializable.PatchIdentifier) tuple.getValueByField(FIELD_HOST_PATCH_IDENTIFIER);
+        Serializable.Mat extracted = (Serializable.Mat) tuple.getValueByField(FIELD_EXTRACTED_TEMPLATE);
+        Serializable.PatchIdentifier parent = (Serializable.PatchIdentifier) tuple.getValueByField(FIELD_PARENT_PATCH_IDENTIFIER);
+
+        String logoIndex = tuple.getStringByField(FIELD_LOGO_INDEX);
+
+        slmDetectors.get(logoIndex).getDetector().addTemplateBySubMat(receivedPatchIdentifier, extracted);
+        slmDetectors.get(logoIndex).getDetector().incrementPriority(parent, 1);
+    }
+
     @Override
     public void declareOutputFields(OutputFieldsDeclarer outputFieldsDeclarer) {
         outputFieldsDeclarer.declareStream(DETECTED_LOGO_STREAM, new Fields(FIELD_FRAME_ID, FIELD_FOUND_RECT, FIELD_PATCH_COUNT, FIELD_SAMPLE_ID));
@@ -214,6 +229,9 @@ public class PatchProcessorFox extends BaseRichBolt {
         outputFieldsDeclarer.declareStream(DETECTED_SIFT_SLM_LOGO_STREAM, new Fields(FIELD_FRAME_ID, FIELD_FOUND_SLM_RECT, FIELD_PATCH_COUNT, FIELD_SAMPLE_ID));
 
         outputFieldsDeclarer.declareStream(LOGO_TEMPLATE_UPDATE_STREAM,
+                new Fields(FIELD_HOST_PATCH_IDENTIFIER, FIELD_EXTRACTED_TEMPLATE, FIELD_PARENT_PATCH_IDENTIFIER, FIELD_LOGO_INDEX));
+
+        outputFieldsDeclarer.declareStream(LOGO_TEMPLATE_UPDATE_STREAM_SLM,
                 new Fields(FIELD_HOST_PATCH_IDENTIFIER, FIELD_EXTRACTED_TEMPLATE, FIELD_PARENT_PATCH_IDENTIFIER, FIELD_LOGO_INDEX));
     }
 }

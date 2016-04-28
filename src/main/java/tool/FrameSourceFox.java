@@ -50,7 +50,7 @@ public class FrameSourceFox extends RedisQueueSpout {
 
 //        System.out.println("Fake image 1");
         opencv_core.IplImage fkImage = new opencv_core.IplImage();
-        opencv_core.IplImage fkimage2 = cvLoadImage("C:\\Users\\Ian\\Desktop\\FYP2\\hog\\1.jpg");
+        opencv_core.IplImage fkimage2 = cvLoadImage(tool.Constants.FAKE_IMAGE);
 //        System.out.println("Fake image 2");
         Serializable.Mat revMat = new Serializable.Mat(imgBytes);
 

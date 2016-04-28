@@ -121,6 +121,10 @@ public interface Constants {
     public static final String HOG_PATCH_FRAME_STREAM = "hog-patch-frame-stream";
     public static final String HOG_PROCESSED_FRAME_STREAM = "hog-processed-frame-stream";
 
+    public static final String LOGO_TEMPLATE_UPDATE_STREAM_SLM = "logo-template-update-stream-slm";
+
+    public static final String FAKE_IMAGE = "C:\\Users\\Ian\\Desktop\\FYP2\\fakeImage.png";
+
 ////////////not used
 
     public static String FIELD_FEATURE_DESC = "feat";

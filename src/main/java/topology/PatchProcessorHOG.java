@@ -32,7 +32,7 @@ public class PatchProcessorHOG extends BaseRichBolt {
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
 //        System.out.println("Fake Image 1A");
-//        opencv_core.Mat mat = opencv_highgui.imread("C:\\Users\\Ian\\Desktop\\FYP2\\hog\\1.jpg", opencv_highgui.CV_LOAD_IMAGE_COLOR);
+//        opencv_core.Mat mat = opencv_highgui.imread(tool.Constants.FAKE_IMAGE, opencv_highgui.CV_LOAD_IMAGE_COLOR);
 //
 //        System.out.println("Fake Image 1B");
 //        opencv_objdetect.HOGDescriptor hog2 = new opencv_objdetect.HOGDescriptor(
@@ -49,7 +49,7 @@ public class PatchProcessorHOG extends BaseRichBolt {
 //        System.out.println("Fake Image 1D - END");
 
         System.out.println("Initializing fake image - " + this.getClass().getCanonicalName());
-        opencv_core.IplImage fakeImage = opencv_highgui.cvLoadImage("C:\\Users\\Ian\\Desktop\\FYP2\\fakeImage.png");
+        opencv_core.IplImage fakeImage = opencv_highgui.cvLoadImage(tool.Constants.FAKE_IMAGE);
         System.out.println("Done initializing fake image - " + this.getClass().getCanonicalName());
 
         this.collector = outputCollector;

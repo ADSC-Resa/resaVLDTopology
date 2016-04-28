@@ -182,8 +182,8 @@ public class tDrawPatchDelta extends BaseRichBolt {
                 for(Serializable.Rect rect : rectList) {
                     JSONObject obj = new JSONObject();
 
-                    obj.put("top", rect.x);
-                    obj.put("left", rect.y);
+                    obj.put("top", rect.y);
+                    obj.put("left", rect.x);
                     obj.put("width", rect.width);
                     obj.put("height", rect.height);
                     obj.put("name", logoId);

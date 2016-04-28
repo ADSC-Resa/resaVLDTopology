@@ -22,8 +22,8 @@ public class HOGDetector implements KryoSerializable {
     public HOGDetector() {
         System.out.println("Initializing fake image - " + this.getClass().getCanonicalName());
         opencv_core.IplImage fakeImage2 = new opencv_core.IplImage();
-        opencv_core.IplImage fakeImage = opencv_highgui.cvLoadImage("C:\\Users\\Ian\\Desktop\\FYP2\\fakeImage.png");
-        opencv_core.Mat fakeMat = opencv_highgui.imread("C:\\Users\\Ian\\Desktop\\FYP2\\fakeImage.png", opencv_highgui.CV_LOAD_IMAGE_COLOR);
+        opencv_core.IplImage fakeImage = opencv_highgui.cvLoadImage(tool.Constants.FAKE_IMAGE);
+        opencv_core.Mat fakeMat = opencv_highgui.imread(tool.Constants.FAKE_IMAGE, opencv_highgui.CV_LOAD_IMAGE_COLOR);
         System.out.println("Done initializing fake image - " + this.getClass().getCanonicalName());
 
         widths = new ArrayList<>();
@@ -105,8 +105,8 @@ public class HOGDetector implements KryoSerializable {
             System.out.println("HOGD_CP0");
             System.out.println("Initializing fake image (Internal) - " + this.getClass().getCanonicalName());
             opencv_core.IplImage fakeImage2 = new opencv_core.IplImage();
-            opencv_core.IplImage fakeImage = opencv_highgui.cvLoadImage("C:\\Users\\Ian\\Desktop\\FYP2\\fakeImage.png");
-            opencv_core.Mat fakeMat = opencv_highgui.imread("C:\\Users\\Ian\\Desktop\\FYP2\\fakeImage.png", opencv_highgui.CV_LOAD_IMAGE_COLOR);
+            opencv_core.IplImage fakeImage = opencv_highgui.cvLoadImage(tool.Constants.FAKE_IMAGE);
+            opencv_core.Mat fakeMat = opencv_highgui.imread(tool.Constants.FAKE_IMAGE, opencv_highgui.CV_LOAD_IMAGE_COLOR);
             System.out.println("Done initializing fake image (Internal) - " + this.getClass().getCanonicalName());
 
             System.out.println("HOGD_CP1 " + croppedTemplate.cols() + " " + croppedTemplate.rows());
